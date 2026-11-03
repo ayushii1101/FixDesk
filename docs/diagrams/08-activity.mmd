@@ -1,0 +1,27 @@
+flowchart TD
+    A([Start]) --> B[Login / Register with OTP]
+    B --> C{Valid credentials?}
+    C -- No --> B
+    C -- Yes --> D{Is administrator?}
+    D -- Yes --> Z1([Admin Console / Exit])
+    D -- No --> RD{Authorised to raise?}
+    RD -- Manager --> Z2([Manage complaints only / Exit])
+
+    RD -- Employee --> E[Report a Problem]
+    E --> F{Validate complaint data}
+    F -- Invalid --> E
+    F -- Valid --> G[Create complaint - status PENDING - staff unassigned]
+    G --> H[Manager reviews complaint]
+    H --> I[Assign maintenance staff]
+    I --> J{Move to IN_PROGRESS?}
+    J -- No, staff unassigned --> H
+    J -- Yes, staff assigned --> K[Set status = IN_PROGRESS]
+    K --> L[Set / adjust priority]
+    L --> M{Resolution ready?}
+    M -- No --> L
+    M -- Yes --> N[Add resolution remarks]
+    N --> O{Remarks present?}
+    O -- No --> N
+    O -- Yes --> P[Set status = RESOLVED - resolved_at recorded]
+    P --> Q[Employee views updated status and history]
+    Q --> R([End / Logout])

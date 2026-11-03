@@ -1,0 +1,106 @@
+graph FixDeskER {
+  bgcolor="white";
+  rankdir=LR;
+  edge [color="#333333"];
+  nodesep=0.35; ranksep=0.75;
+
+  // Entity nodes
+  node [shape=box, style=filled, fillcolor="#dbe9f6", color="#1f4e79", fontname="Helvetica"];
+
+  AUTH  [label="AUTH.USERS\n(managed by Supabase Auth)"];
+  PROF  [label=<<u>PROFILES</u>>];
+  UROLE [label=<<u>USER_ROLES</u>>];
+  CAT   [label=<<u>CATEGORIES</u>>];
+  STAF  [label=<<u>MAINTENANCE_STAFF</u>>];
+  COMP  [label=<<u>COMPLAINTS</u>>];
+  HIST  [label=<<u>COMPLAINT_HISTORY</u>>];
+
+  // Attribute nodes (ovals)
+  node [shape=ellipse, style=filled, fillcolor="#ffffff", color="#1f4e79"];
+
+  // profiles attrs
+  PNAME  [label="name"];
+  PEM    [label="email"];
+  PDEPT  [label="department"];
+  PCREAT [label="created_at"];
+
+  // user_roles attrs
+  RID   [label=<<u>id</u>>];
+  RROLE [label="role\n(app_role)"];
+
+  // categories attrs
+  CID   [label=<<u>id</u>>];
+  CNM   [label="name\n(UNIQUE)"];
+
+  // maintenance_staff attrs
+  SID    [label=<<u>id</u>>];
+  SNM    [label="name"];
+  SDPT   [label="department"];
+  SPH    [label="phone"];
+
+  // complaints attrs
+  COID    [label=<<u>id</u>>];
+  CNUM    [label="complaint_no\n(UNIQUE)"];
+  CEMPID  [label="employee_id (FK)"];
+  CCAST   [label="category_id (FK)"];
+  CSID    [label="assigned_staff_id (FK)"];
+  CPTY    [label="problem_type"];
+  CDESC   [label="description"];
+  CLOC    [label="location"];
+  CPRI    [label="priority\n(LOW/MEDIUM/HIGH)"];
+  CSTA    [label="status\n(PENDING/IN_PROGRESS/RESOLVED)"];
+  CREM    [label="resolution_remarks"];
+  CCR     [label="created_at"];
+  CUPD    [label="updated_at"];
+  CRES    [label="resolved_at"];
+
+  // complaint_history attrs
+  HID     [label=<<u>id</u>>];
+  HCID    [label="complaint_id (FK)"];
+  HACT    [label="action"];
+  HCREAT  [label="created_at"];
+
+  // Relationship nodes (diamonds)
+  node [shape=diamond, style=filled, fillcolor="#fbe9d2", color="#b45309"];
+
+  R_AUTH_PROF  [label="has profile"];
+  R_AUTH_ROLE  [label="has role"];
+  R_AUTH_COMP  [label="raises"];
+  R_COMP_CAT   [label="belongs to"];
+  R_COMP_STAF  [label="assigned to"];
+  R_COMP_HIST  [label="has history"];
+
+  // relationships
+  AUTH  -- R_AUTH_PROF -- PROF;
+  AUTH  -- R_AUTH_ROLE -- UROLE;
+  AUTH  -- R_AUTH_COMP -- COMP;
+
+  COMP  -- R_COMP_CAT  -- CAT;
+  COMP  -- R_COMP_STAF -- STAF;
+  COMP  -- R_COMP_HIST -- HIST;
+
+  // cardinalities
+  R_AUTH_PROF -- AUTH [label="1", fontcolor="#b45309"];
+  R_AUTH_PROF -- PROF [label="1", fontcolor="#b45309"];
+  R_AUTH_ROLE -- AUTH [label="1", fontcolor="#b45309"];
+  R_AUTH_ROLE -- UROLE [label="M", fontcolor="#b45309"];
+  R_AUTH_COMP -- AUTH [label="1", fontcolor="#b45309"];
+  R_AUTH_COMP -- COMP [label="M", fontcolor="#b45309"];
+  R_COMP_CAT  -- CAT  [label="1", fontcolor="#b45309"];
+  R_COMP_CAT  -- COMP [label="M", fontcolor="#b45309"];
+  R_COMP_STAF -- STAF [label="1", fontcolor="#b45309"];
+  R_COMP_STAF -- COMP [label="M", fontcolor="#b45309"];
+  R_COMP_HIST -- COMP [label="1", fontcolor="#b45309"];
+  R_COMP_HIST -- HIST [label="M", fontcolor="#b45309"];
+
+  // attributes around each entity
+  PROF -- PNAME; PROF -- PEM; PROF -- PDEPT; PROF -- PCREAT;
+  UROLE -- RID;  UROLE -- RROLE;
+  CAT -- CID;    CAT -- CNM;
+  STAF -- SID;   STAF -- SNM; STAF -- SDPT; STAF -- SPH;
+  COMP -- COID;  COMP -- CNUM; COMP -- CEMPID; COMP -- CCAST;
+  COMP -- CSID;  COMP -- CPTY; COMP -- CDESC; COMP -- CLOC;
+  COMP -- CPRI;  COMP -- CSTA; COMP -- CREM;  COMP -- CCR;
+  COMP -- CUPD;  COMP -- CRES;
+  HIST -- HID;   HIST -- HCID; HIST -- HACT;  HIST -- HCREAT;
+}

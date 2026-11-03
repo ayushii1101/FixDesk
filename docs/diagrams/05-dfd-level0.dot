@@ -1,0 +1,29 @@
+digraph DFD0 {
+  rankdir=LR;
+  bgcolor="white";
+  node [fontname="Helvetica", color="#1f4e79"];
+  edge [color="#333333", fontsize=9];
+
+  // External entities (rectangles)
+  EMP [shape=box, style=filled, fillcolor="#dbe9f6", label="EMPLOYEE"];
+  MGR [shape=box, style=filled, fillcolor="#dbe9f6", label="MANAGER"];
+  ADM [shape=box, style=filled, fillcolor="#dbe9f6", label="ADMIN"];
+
+  // Central process (circle)
+  SYS [shape=circle, style=filled, fillcolor="#1f4e79", fontcolor="white",
+       label="FIX DESK\nSYSTEM"];
+
+  // Data store (cylinder)
+  DB  [shape=cylinder, style=filled, fillcolor="#dbe9f6", label="SUPABASE\nDATABASE"];
+
+  EMP -> SYS [label="register (OTP) / login / reset password\nreport complaint / view own complaints"];
+  SYS -> EMP [label="auth result / complaint + status\nhistory / profile info"];
+
+  MGR -> SYS [label="login\nmanage complaints (assign/priority/status/remarks)\nmanage staff / filter lists"];
+  SYS -> MGR [label="all complaints / staff directory\nupdated status"];
+
+  ADM -> SYS [label="admin login (role check)\nmanage users / managers / categories"];
+  SYS -> ADM [label="user list + roles / category counts"];
+
+  SYS -> DB [dir=both, label="profiles / user_roles / categories\nmaintenance_staff / complaints\ncomplaint_history"];
+}

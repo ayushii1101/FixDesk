@@ -1,0 +1,61 @@
+digraph FixDeskBlock {
+  rankdir=LR;
+  bgcolor="white";
+  node [fontname="Helvetica", color="#1f4e79", fontcolor="#1f4e79"];
+  edge [color="#333333", arrowsize=0.8];
+
+  // Actors
+  EMP  [shape=box, style=filled, fillcolor="#dbe9f6", label="EMPLOYEE\n(Internal Staff)"];
+  MGR  [shape=box, style=filled, fillcolor="#dbe9f6", label="MANAGER\n(Facility Manager)"];
+  ADM  [shape=box, style=filled, fillcolor="#dbe9f6", label="ADMIN\n(System Admin)"];
+
+  // Function blocks
+  EMPF [shape=box, style="filled,rounded", fillcolor="#ffffff", label=<
+      <b>Employee Functions</b><br/>
+      <font point-size="10">&#8226; Register / Login (OTP)<br/>
+      &#8226; Report a complaint (PENDING)<br/>
+      &#8226; Track complaints &amp; status<br/>
+      &#8226; View complaint history<br/>
+      &#8226; Forgot / reset password<br/></font>
+  >];
+  MGRF [shape=box, style="filled,rounded", fillcolor="#ffffff", label=<
+      <b>Manager Functions</b><br/>
+      <font point-size="10">&#8226; View / filter all complaints<br/>
+      &#8226; Assign maintenance staff<br/>
+      &#8226; Set priority &amp; status<br/>
+      &#8226; Add resolution remarks<br/>
+      &#8226; Manage staff directory<br/></font>
+  >];
+  ADMF [shape=box, style="filled,rounded", fillcolor="#ffffff", label=<
+      <b>Admin Functions</b><br/>
+      <font point-size="10">&#8226; Admin login (role check)<br/>
+      &#8226; Manage users (edit/promote/delete)<br/>
+      &#8226; Manage managers (add/demote/delete)<br/>
+      &#8226; Manage complaint categories<br/>
+      &#8226; Create / delete accounts (server fn)<br/></font>
+  >];
+
+  // Central server + database
+  SERVER [shape=box, style=filled, fillcolor="#1f4e79", fontcolor="white",
+          label="FIX DESK SERVER\nReact + TanStack Start\n(SPA / SSR / Server Functions)"];
+  DB [shape=cylinder, style=filled, fillcolor="#dbe9f6", label="SUPABASE / PostgreSQL\ncomplaints  /  profiles  /  user_roles\nmaintenance_staff  /  categories\ncomplaint_history"];
+
+  // Layout alignment
+  { rank=same; EMP; MGR; ADM; }
+  { rank=same; EMPF; MGRF; ADMF; }
+  { rank=same; SERVER; DB; }
+
+  EMP  -> EMPF;
+  MGR  -> MGRF;
+  ADM  -> ADMF;
+  EMPF -> SERVER [label="  HTTP / JSON", fontsize=9];
+  MGRF -> SERVER [label="  HTTP / JSON", fontsize=9];
+  ADMF -> SERVER [label="  HTTP / JSON", fontsize=9];
+  SERVER -> DB   [dir=both, label=" SQL / RLS ", fontsize=9];
+
+  // Vertical stacking
+  EMP  -> MGR  [style=invis];
+  MGR  -> ADM  [style=invis];
+  EMPF -> MGRF [style=invis];
+  MGRF -> ADMF [style=invis];
+}

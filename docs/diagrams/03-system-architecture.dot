@@ -1,0 +1,43 @@
+digraph FixDeskArch {
+  rankdir=TB;
+  bgcolor="white";
+  node [shape=box, style=rounded, fontname="Helvetica", color="#1f4e79"];
+  edge [color="#333333", arrowsize=0.8, fontsize=9, fontname="Helvetica"];
+
+  // Actors
+  E  [label="Employee (Browser)"];
+  M  [label="Manager (Browser)"];
+  A  [label="Admin (Browser)"];
+
+  subgraph cluster_web {
+    label="Fix Desk Frontend (TanStack Start / Vite)";
+    style=rounded; color="#1f4e79"; fontcolor="#1f4e79";
+    SPA [label="React SPA + Server Functions\nRouter route guards / React Query"];
+    SVR [label="Server-Function Handlers\n(adminCreateUserFn / adminDeleteUserFn)"];
+  }
+
+  subgraph cluster_auth {
+    label="Supabase Auth";
+    style=rounded; color="#1f4e79"; fontcolor="#1f4e79";
+    U  [label="Email/Password / OTP / Sessions"];
+  }
+
+  UDB [label="PostgreSQL (RLS + Triggers)",
+       fillcolor="#dbe9f6", style="filled,rounded"];
+
+  SRV [label="Service-Role Admin Client\n(supabaseAdmin, server only)",
+       fillcolor="#dbe9f6", style="filled,rounded"];
+
+  E  -> SPA [label="Login / Register\nReport &amp; track complaints"];
+  M  -> SPA [label="Login / Manage\ncomplaints &amp; staff"];
+  A  -> SPA [label="Login / Admin console"];
+
+  SPA -> U  [dir=both, label="signUp / signInWithPassword\nverifyOtp / resetPasswordForEmail\nsession token / refresh"];
+  U  -> UDB [dir=both, label="auth.users / handle_new_user\ntrigger (profile + role)"];
+
+  SPA -> UDB [dir=both, label="PostgREST + RLS\n(complaints / staff / categories\nprofiles / roles / history)"];
+
+  SPA -> SVR [dir=both, label="createServerFn RPC\n(Bearer token via attachSupabaseAuth)"];
+  SVR -> SRV [label="service_role\n(create / delete auth users)"];
+  SRV -> UDB [dir=both, label="auth.users / user_roles"];
+}

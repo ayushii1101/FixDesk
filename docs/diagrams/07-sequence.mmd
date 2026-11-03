@@ -1,0 +1,42 @@
+sequenceDiagram
+    autonumber
+    actor Emp as Employee
+    participant UI as Fix Desk UI (React)
+    participant AU as Supabase Auth
+    participant DB as Supabase (PostgREST + RLS)
+    actor Mgr as Manager
+
+    %% Authentication
+    Emp->>UI: Enter email + password (or register with OTP)
+    UI->>AU: signInWithPassword(email, password)
+    AU-->>UI: session (access_token)
+    UI->>DB: read profile + user_roles (RLS)
+    DB-->>UI: profile + role (EMPLOYEE/MANAGER/ADMIN)
+
+    %% Employee submits complaint
+    Emp->>UI: Report a Problem (category, type, location, desc, priority)
+    UI->>DB: insert complaints (status=PENDING, no staff) [RLS: own]
+    DB-->>UI: complaint created (complaint_no) + insert trigger
+    DB->>DB: log "Complaint submitted" to complaint_history
+    UI-->>Emp: Complaint ID (CMP-0000) + status PENDING
+
+    %% Manager works the complaint
+    Mgr->>UI: View All Complaints (filter / search)
+    UI->>DB: select complaints (RLS: MANAGER sees all)
+    DB-->>UI: complaint list
+    Mgr->>UI: Assign maintenance staff
+    UI->>DB: update complaints (assigned_staff_id)
+    DB->>DB: log "Assigned to <staff>"
+    Mgr->>UI: Set priority + status (IN_PROGRESS requires staff)
+    UI->>DB: update complaints (priority, status)
+    DB->>DB: log "Priority changed" / "Status changed"
+    Mgr->>UI: Add resolution remarks
+    UI->>DB: update complaints (remarks, status=RESOLVED)
+    DB->>DB: log "Resolution remarks added" + set resolved_at
+    DB-->>UI: updated complaint (RESOLVED)
+
+    %% Employee views resolution
+    Emp->>UI: Open My Complaints -> Details
+    UI->>DB: select complaint + complaint_history (RLS: own)
+    DB-->>UI: status RESOLVED + remarks + history
+    UI-->>Emp: Resolution status shown

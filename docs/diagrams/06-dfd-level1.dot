@@ -1,0 +1,66 @@
+digraph DFD1 {
+  rankdir=LR;
+  bgcolor="white";
+  node [fontname="Helvetica", color="#1f4e79"];
+  edge [color="#333333", fontsize=9];
+
+  // External entity
+  USR [shape=box, style=filled, fillcolor="#dbe9f6", label="EMPLOYEE /\nMANAGER /\nADMIN"];
+
+  // Processes (numbered circles)
+  P1 [shape=circle, style=filled, fillcolor="#1f4e79", fontcolor="white", label="1.0\nAuthentication\nregister / login / OTP / reset"];
+  P2 [shape=circle, style=filled, fillcolor="#1f4e79", fontcolor="white", label="2.0\nProfile & Role\nget profile / resolve role"];
+  P3 [shape=circle, style=filled, fillcolor="#1f4e79", fontcolor="white", label="3.0\nComplaint Mgmt\n(Employee)\nsubmit / view own\nPENDING / unassigned"];
+  P4 [shape=circle, style=filled, fillcolor="#215991", fontcolor="white", label="4.0\nComplaint Mgmt\n(Manager)\nassign staff / priority\nstatus / remarks"];
+  P5 [shape=circle, style=filled, fillcolor="#215991", fontcolor="white", label="5.0\nStaff Mgmt\nadd / edit directory"];
+  P6 [shape=circle, style=filled, fillcolor="#245a43", fontcolor="white", label="6.0\nHistory Logging\ninsert / update triggers"];
+  P7 [shape=circle, style=filled, fillcolor="#7a3e3e", fontcolor="white", label="7.0\nAdmin Mgmt\nusers / managers\ncategories / accounts"];
+
+  // Data stores (cylinders) on the right
+  node [shape=cylinder, style=filled, fillcolor="#dbe9f6"];
+  D_AUTH   [label="AUTH.USERS"];
+  D_PROF   [label="PROFILES"];
+  D_ROLE   [label="USER_ROLES"];
+  D_CAT    [label="CATEGORIES"];
+  D_STAF   [label="MAINTENANCE_STAFF"];
+  D_COMP   [label="COMPLAINTS"];
+  D_HIST   [label="COMPLAINT_HISTORY"];
+
+  // Requests / responses
+  USR -> P1 [label="credentials / OTP"];
+  P1 -> USR [label="session / auth result"];
+  P1 -> D_AUTH [dir=both, label="auth.users / trigger"];
+
+  USR -> P2 [label="get my profile"];
+  P2 -> USR [label="profile + role"];
+  P2 -> D_PROF [dir=both, label="read / update (ADMIN)"];
+  P2 -> D_ROLE [dir=both, label="resolve / assign role"];
+
+  USR -> P3 [label="submit complaint / list mine"];
+  P3 -> USR [label="complaint + status (+ history)"];
+  P3 -> D_COMP [dir=both, label="insert / select (RLS own)"];
+  P3 -> D_CAT  [label="read categories"];
+
+  USR -> P4 [label="manage / filter all complaints"];
+  P4 -> USR [label="complaints + staff + updated status"];
+  P4 -> D_COMP [dir=both, label="select / update (RLS MANAGER)"];
+  P4 -> D_STAF [label="read staff for assignment"];
+
+  USR -> P5 [label="add / edit staff"];
+  P5 -> USR [label="saved staff record"];
+  P5 -> D_STAF [dir=both, label="insert / update (RLS MANAGER)"];
+
+  P3 -> P6 [label="after insert"];
+  P4 -> P6 [label="before update"];
+  P6 -> D_HIST [label="write action log"];
+  D_HIST -> P3 [label="history read"];
+  D_HIST -> P4 [label="history read"];
+
+  USR -> P7 [label="admin ops (users/managers/categories)"];
+  P7 -> USR [label="user list + roles / counts"];
+  P7 -> D_PROF [dir=both, label="select / update"];
+  P7 -> D_ROLE [dir=both, label="insert / delete role"];
+  P7 -> D_CAT  [dir=both, label="insert / update / delete"];
+  P7 -> D_COMP [label="read count (block category delete)"];
+  P7 -> D_AUTH [dir=both, label="create / delete user\n(service-role server fn)"];
+}

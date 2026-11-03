@@ -1,0 +1,61 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam linetype ortho
+skinparam defaultFontName Helvetica
+left to right direction
+
+actor "Employee" as EMP
+actor "Manager" as MGR
+actor "Admin" as ADM
+
+rectangle "FIX DESK" as BOUNDARY {
+  usecase "Register (Email OTP)" as E1
+  usecase "Login" as E2
+  usecase "Logout" as E3
+  usecase "Forgot / Reset Password" as E4
+  usecase "Report a Complaint" as E5
+  usecase "View My Complaints" as E6
+  usecase "View Complaint Details & History" as E7
+
+  usecase "View / Filter All Complaints" as M1
+  usecase "Assign Maintenance Staff" as M2
+  usecase "Set Priority" as M3
+  usecase "Change Status" as M4
+  usecase "Add Resolution Remarks" as M5
+  usecase "Manage Maintenance Staff" as M6
+
+  usecase "Admin Login (Role Verified)" as A1
+  usecase "View Admin Dashboard" as A2
+  usecase "Manage Users" as A3
+  usecase "Manage Managers" as A4
+  usecase "Manage Categories" as A5
+}
+
+' Employee associations
+EMP --> E1
+EMP --> E2
+EMP --> E3
+EMP --> E4
+EMP --> E5
+EMP --> E6
+EMP --> E7
+
+' Manager associations
+MGR --> E2
+MGR --> E3
+MGR --> M1
+MGR --> M2
+MGR --> M3
+MGR --> M4
+MGR --> M5
+MGR --> M6
+
+' Admin associations
+ADM --> A1
+ADM --> E3
+ADM --> A2
+ADM --> A3
+ADM --> A4
+ADM --> A5
+@enduml
